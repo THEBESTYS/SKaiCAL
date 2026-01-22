@@ -26,6 +26,7 @@ const Footer: React.FC<FooterProps> = ({ onNavigate }) => {
               <li><button onClick={() => onNavigate(ViewType.HOME)} className="hover:text-rose-500 transition-colors">Home Overview</button></li>
               <li><button onClick={() => onNavigate(ViewType.S_LOTTE)} className="hover:text-rose-500 transition-colors">S-Lotte Hub</button></li>
               <li><button onClick={() => onNavigate(ViewType.L_SPHERE)} className="hover:text-rose-500 transition-colors">L-Sphere Space</button></li>
+              <li><button onClick={() => onNavigate(ViewType.CERTIFICATES)} className="hover:text-rose-500 transition-colors text-rose-400 font-bold">Certificates</button></li>
               <li><a href="https://www.youtube.com/imagineyourkorea" target="_blank" rel="noreferrer" className="hover:text-rose-500 transition-colors">Imagine K</a></li>
             </ul>
           </div>

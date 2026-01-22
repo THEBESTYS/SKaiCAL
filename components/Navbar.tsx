@@ -1,7 +1,7 @@
 
 import React from 'react';
 import { ViewType } from '../types.ts';
-import { Search, User, ExternalLink, Sparkles } from 'lucide-react';
+import { Search, User, ExternalLink, Sparkles, Award } from 'lucide-react';
 
 interface NavbarProps {
   currentView: ViewType;
@@ -34,6 +34,13 @@ const Navbar: React.FC<NavbarProps> = ({ currentView, onNavigate }) => {
             className={`text-sm font-medium tracking-wide transition-all ${currentView === ViewType.L_SPHERE ? 'text-rose-600 font-bold' : 'text-zinc-500 hover:text-rose-600'}`}
           >
             L-Sphere
+          </button>
+          <button 
+            onClick={() => onNavigate(ViewType.CERTIFICATES)}
+            className={`text-sm font-medium tracking-wide transition-all flex items-center gap-1.5 ${currentView === ViewType.CERTIFICATES ? 'text-rose-600 font-bold' : 'text-zinc-500 hover:text-rose-600'}`}
+          >
+            <Award size={14} className={currentView === ViewType.CERTIFICATES ? 'text-rose-600' : 'text-zinc-400'} />
+            Certificates
           </button>
           
           {/* Imagine K Link */}

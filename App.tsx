@@ -4,6 +4,7 @@ import Navbar from './components/Navbar.tsx';
 import HomeView from './components/HomeView.tsx';
 import SLotteView from './components/SLotteView.tsx';
 import LSphereView from './components/LSphereView.tsx';
+import CertificatesView from './components/CertificatesView.tsx';
 import Footer from './components/Footer.tsx';
 import { ViewType } from './types.ts';
 
@@ -22,6 +23,8 @@ const App: React.FC = () => {
         return <SLotteView />;
       case ViewType.L_SPHERE:
         return <LSphereView />;
+      case ViewType.CERTIFICATES:
+        return <CertificatesView />;
       default:
         return <HomeView onNavigate={setCurrentView} />;
     }
