@@ -1,11 +1,11 @@
 
 import React, { useState, useEffect } from 'react';
-import Navbar from './components/Navbar';
-import HomeView from './components/HomeView';
-import SLotteView from './components/SLotteView';
-import LSphereView from './components/LSphereView';
-import Footer from './components/Footer';
-import { ViewType } from './types';
+import Navbar from './components/Navbar.tsx';
+import HomeView from './components/HomeView.tsx';
+import SLotteView from './components/SLotteView.tsx';
+import LSphereView from './components/LSphereView.tsx';
+import Footer from './components/Footer.tsx';
+import { ViewType } from './types.ts';
 
 const App: React.FC = () => {
   const [currentView, setCurrentView] = useState<ViewType>(ViewType.HOME);
@@ -28,12 +28,12 @@ const App: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen flex flex-col">
+    <div className="min-h-screen flex flex-col selection:bg-rose-100 selection:text-rose-900">
       <Navbar currentView={currentView} onNavigate={setCurrentView} />
-      <main className="flex-grow pt-20">
+      <main className="flex-grow">
         {renderView()}
       </main>
-      <Footer />
+      <Footer onNavigate={setCurrentView} />
     </div>
   );
 };
