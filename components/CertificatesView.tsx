@@ -17,15 +17,18 @@ import {
   Layers,
   MapPin,
   Calendar,
-  Tool,
   Wrench,
   Trophy,
   Target,
   Users,
-  CreditCard,
   Gift,
-  // Added missing Sparkles icon
-  Sparkles
+  Sparkles,
+  ClipboardCheck,
+  CreditCard,
+  Send,
+  Info,
+  ChevronLeft,
+  Smartphone
 } from 'lucide-react';
 
 interface CertDetail {
@@ -53,10 +56,19 @@ interface CertDetail {
     discount: string;
     scholarship: string;
   };
+  // 지원 프로세스 전용 데이터
+  applicationProcess?: string[];
+  scheduleDetails?: string;
 }
 
 const CertificatesView: React.FC = () => {
   const [selectedCert, setSelectedCert] = useState<CertDetail | null>(null);
+  const [isApplicationMode, setIsApplicationMode] = useState(false);
+
+  const closeModal = () => {
+    setSelectedCert(null);
+    setIsApplicationMode(false);
+  };
 
   const certs: (CertDetail & { badges: string[], icon: React.ReactNode, color: string })[] = [
     {
@@ -91,12 +103,14 @@ const CertificatesView: React.FC = () => {
       careers: ["에듀테크 기획자", "K-문화 교육 설계사", "디지털 러닝 전문가", "문화 AI 개발자"],
       effects: ["K-문화 교육 시장 경쟁력 확보", "AI 융합 전문가 전문성 인정", "글로벌 교육 협업 기회 확대"],
       benefits: ["롯데 면세점 10% 할인권", "W-KPOP 공연 초대권", "연세대 평생교육원 할인"],
-      eligibility: ["4년제 대학 졸업자", "기본적 IT 활용 능력 보유", "K-문화에 대한 깊은 이해"],
+      eligibility: ["4년제 대학 졸업자 또는 동등 경력", "기본적 IT 활용 능력 보유", "K-문화에 대한 깊은 이해"],
       cost: {
         base: "2,400,000원",
         discount: "롯데 임직원 20% 할인",
         scholarship: "우수 수강생 장학금 3명 선발"
-      }
+      },
+      applicationProcess: ["지원서 제출 (온라인)", "서류 심사 및 면접", "최종 합격 통보 및 등록", "오리엔테이션"],
+      scheduleDetails: "매년 3월, 9월 개강 (월/수 저녁 7시 라이브 세션)"
     },
     {
       title: "W-KPOP 공식 댄스 교육사",
@@ -130,12 +144,14 @@ const CertificatesView: React.FC = () => {
       careers: ["K-POP 댄스 트레이너", "글로벌 아카데미 강사", "엔터테인먼트 퍼포먼스 디렉터"],
       effects: ["공식 라이선스 기반 공신력 확보", "최첨단 티칭 테크놀로지 습득", "해외 지점 파견 우선권"],
       benefits: ["W-KPOP 공식 교육사 명패", "글로벌 오디션 심사위원 자격", "연습실 무료 대관"],
-      eligibility: ["댄스 관련 전공자 혹은 경력자", "기본적인 영어 커뮤니케이션 가능자"],
+      eligibility: ["댄스 관련 전공자 혹은 경력 2년 이상", "기본적인 영어 커뮤니케이션 가능자"],
       cost: {
         base: "1,850,000원",
-        discount: "얼리버드 10% 할인",
-        scholarship: "최우수 실기자 전액 장학금"
-      }
+        discount: "얼리버드 신청 시 10% 할인",
+        scholarship: "최우수 실기자 전액 장학금 지원"
+      },
+      applicationProcess: ["오디션 영상 제출", "대면 티칭 심사", "라이선스 계약 서명", "최종 등록"],
+      scheduleDetails: "격월 개강 (토요일 전일 집중 교육)"
     },
     {
       title: "AI 기반 학습 설계사",
@@ -169,12 +185,14 @@ const CertificatesView: React.FC = () => {
       careers: ["교육공학 전문가", "L&D 컨설턴트", "AI 교육 서비스 기획자"],
       effects: ["데이터 사이언스 기반 교육 전문성", "연세대 공식 공동 수료증 취득", "HRD 시장 내 독보적 커리어"],
       benefits: ["연세대학교 도서관 이용권", "학술 데이터베이스 접근 권한", "롯데 HR 컨퍼런스 초대"],
-      eligibility: ["교육 업계 3년 이상 경력자", "데이터 분석 기초 지식 보유자"],
+      eligibility: ["교육/HR 업계 3년 이상 경력자", "데이터 분석 기초 지식 보유자"],
       cost: {
         base: "2,100,000원",
         discount: "기업 단체 수강 15% 할인",
-        scholarship: "연구 과제 우수자 시상"
-      }
+        scholarship: "연구 과제 우수자 시상금"
+      },
+      applicationProcess: ["학력/경력 증명서 제출", "AI 기초 적성 검사", "온라인 인터뷰", "수강 확정"],
+      scheduleDetails: "매주 목요일 저녁 8시 (100% 온라인 라이브)"
     },
     {
       title: "K-문화 관광 코디네이터",
@@ -208,12 +226,14 @@ const CertificatesView: React.FC = () => {
       careers: ["관광 상품 기획자", "VIP 의전 코디네이터", "문화 관광 가이드 전문가"],
       effects: ["롯데 그룹 관광 계열사 채용 우대", "글로벌 관광 네트워크 확장", "K-콘텐츠 비즈니스 역량 강화"],
       benefits: ["롯데호텔 객실 할인권", "면세점 골드 등급 업그레이드", "전용 유니폼 지급"],
-      eligibility: ["관광 관련 전공자 우대", "외국어(영/중/일) 1종 이상 능통자"],
+      eligibility: ["관광 관련 전공자 우대", "외국어(영/중/일 중 1종) 능통자"],
       cost: {
         base: "1,200,000원",
-        discount: "관광 전공 학생 20% 할인",
+        discount: "관광 전공 학생 20% 특별 할인",
         scholarship: "롯데 관광 아이디어 공모전 상금"
-      }
+      },
+      applicationProcess: ["포트폴리오 제출", "외국어 구술 면접", "현장 적성 테스트", "선발 완료"],
+      scheduleDetails: "주말반 운영 (토/일 오후)"
     },
     {
       title: "K-Beauty & AR 메이크업 교육사",
@@ -247,12 +267,14 @@ const CertificatesView: React.FC = () => {
       careers: ["뷰티 에듀케이터", "디지털 뷰티 컨설턴트", "K-Beauty 브랜드 엠버서더"],
       effects: ["디지털 뷰티 전문가로서의 희소성", "글로벌 뷰티 브랜드 협업 기회", "온라인 뷰티 창업 역량 확보"],
       benefits: ["롯데 면세점 뷰티 샘플 박스", "유명 아티스트 마스터클래스", "브랜드 런칭 행사 초대"],
-      eligibility: ["뷰티 관련 자격증 소지자 우대", "디지털 기기 활용 능숙자"],
+      eligibility: ["뷰티 자격증 소지자 혹은 경력자 우대", "디지털 기기 활용 능숙자"],
       cost: {
         base: "1,500,000원",
-        discount: "파트너사 추천 15% 할인",
-        scholarship: "베스트 아티스트상 상품권"
-      }
+        discount: "파트너사 추천 인원 15% 할인",
+        scholarship: "베스트 아티스트상 상품권 시상"
+      },
+      applicationProcess: ["메이크업 포트폴리오 제출", "기술 면접", "도구 활용능력 테스트", "합격"],
+      scheduleDetails: "화/목 오전반 혹은 주말반 선택 가능"
     },
     {
       title: "기업 맞춤형 K-문화 컨설턴트",
@@ -286,12 +308,14 @@ const CertificatesView: React.FC = () => {
       careers: ["기업 교육(L&D) 컨설턴트", "글로벌 HR 전문가", "B2B 전략 기획자"],
       effects: ["고수익 컨설팅 비즈니스 가능", "대기업 네트워크 형성 및 협업", "글로벌 비즈니스 매너 리더십"],
       benefits: ["롯데 그룹 B2B 파트너 등록", "비즈니스 라운지 무상 이용", "연간 컨설턴트 세미나 지원"],
-      eligibility: ["기업 교육/HR 5년 이상 경력자", "컨설팅 실무 경험자 우대"],
+      eligibility: ["기업 교육/HR/컨설팅 5년 이상 경력자", "석사 학위 이상 소지자 우대"],
       cost: {
         base: "2,800,000원",
-        discount: "협력 기관 20% 할인",
-        scholarship: "프로젝트 우수자 비즈니스 지원금"
-      }
+        discount: "협력 기업 추천 20% 할인",
+        scholarship: "최우수 프로젝트 비즈니스 지원금"
+      },
+      applicationProcess: ["경력 기술서 제출", "전략 컨설팅 면접", "비즈니스 케이스 분석", "최종 선발"],
+      scheduleDetails: "매주 금요일 오후 (집중 세션)"
     }
   ];
 
@@ -357,7 +381,10 @@ const CertificatesView: React.FC = () => {
               </p>
 
               <button 
-                onClick={() => setSelectedCert(cert)}
+                onClick={() => {
+                  setSelectedCert(cert);
+                  setIsApplicationMode(false);
+                }}
                 className={`w-full py-4 bg-zinc-950 text-white rounded-full font-bold text-sm tracking-wide transition-all group-hover:bg-rose-600 flex items-center justify-center gap-2`}
               >
                 상세 정보 보기 <ArrowRight size={16} />
@@ -367,194 +394,264 @@ const CertificatesView: React.FC = () => {
         </div>
       </section>
 
-      {/* Modal / Detailed Info View */}
+      {/* Modal / Detailed & Application View */}
       {selectedCert && (
         <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 md:p-10 animate-in fade-in duration-300">
-          <div className="absolute inset-0 bg-zinc-950/80 backdrop-blur-md" onClick={() => setSelectedCert(null)}></div>
+          <div className="absolute inset-0 bg-zinc-950/90 backdrop-blur-xl" onClick={closeModal}></div>
           
           <div className="relative bg-white w-full max-w-5xl max-h-[90vh] rounded-[3rem] overflow-hidden shadow-2xl flex flex-col animate-in zoom-in-95 duration-300">
             {/* Modal Header */}
-            <div className="bg-zinc-950 text-white p-8 md:p-12 relative">
+            <div className={`bg-zinc-950 text-white p-8 md:p-12 relative transition-all duration-500 ${isApplicationMode ? 'bg-rose-700' : ''}`}>
                 <button 
-                  onClick={() => setSelectedCert(null)}
-                  className="absolute top-8 right-8 p-2 bg-white/10 hover:bg-rose-600 rounded-full transition-all"
+                  onClick={closeModal}
+                  className="absolute top-8 right-8 p-2 bg-white/10 hover:bg-white/20 rounded-full transition-all"
                 >
                   <X size={24} />
                 </button>
+                {isApplicationMode && (
+                  <button 
+                    onClick={() => setIsApplicationMode(false)}
+                    className="flex items-center gap-2 text-rose-100 mb-6 hover:text-white transition-colors"
+                  >
+                    <ChevronLeft size={20} /> 상세 정보로 돌아가기
+                  </button>
+                )}
                 <div className="space-y-4">
-                    <div className="inline-flex items-center gap-2 px-3 py-1 bg-rose-600 rounded-full text-[10px] font-bold uppercase tracking-widest">
-                        Professional Consulting
+                    <div className="inline-flex items-center gap-2 px-3 py-1 bg-white/20 rounded-full text-[10px] font-bold uppercase tracking-widest">
+                        {isApplicationMode ? 'Application Guide' : 'Professional Consulting'}
                     </div>
-                    <h2 className="text-4xl md:text-5xl font-serif font-bold tracking-tight">{selectedCert.title}</h2>
-                    <p className="text-zinc-400 text-lg max-w-2xl font-light leading-relaxed">
-                        선택하신 인증 프로그램에 대해 전문 컨설턴트로서 상세한 가이드를 제공해 드립니다.
+                    <h2 className="text-4xl md:text-5xl font-serif font-bold tracking-tight">
+                      {isApplicationMode ? `${selectedCert.title} 지원 안내` : selectedCert.title}
+                    </h2>
+                    <p className="text-white/60 text-lg max-w-2xl font-light leading-relaxed">
+                        {isApplicationMode 
+                          ? '프로그램 지원을 위해 필수 섹션을 확인해 주세요. 당신의 새로운 도전을 KaiCA가 함께합니다.'
+                          : '선택하신 인증 프로그램에 대해 전문 컨설턴트로서 상세한 가이드를 제공해 드립니다.'
+                        }
                     </p>
                 </div>
             </div>
 
             {/* Modal Content - Scrollable */}
             <div className="flex-grow overflow-y-auto p-8 md:p-12 space-y-16">
-                {/* 1. Overview */}
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-6">
-                    {[
-                        { icon: <Building size={18} />, label: "인증 기관", value: selectedCert.overview.institution },
-                        { icon: <Layers size={18} />, label: "수준", value: selectedCert.overview.level },
-                        { icon: <Clock size={18} />, label: "소요 시간", value: selectedCert.overview.duration },
-                        { icon: <MapPin size={18} />, label: "교육 형태", value: selectedCert.overview.format },
-                        { icon: <Calendar size={18} />, label: "유효 기간", value: selectedCert.overview.validity },
-                    ].map((item, i) => (
-                        <div key={i} className="p-6 bg-zinc-50 rounded-3xl space-y-3">
-                            <div className="text-rose-600">{item.icon}</div>
-                            <div className="text-[10px] font-bold text-zinc-400 uppercase tracking-widest">{item.label}</div>
-                            <div className="text-sm font-bold text-zinc-900 leading-snug">{item.value}</div>
-                        </div>
-                    ))}
-                </div>
-
-                {/* 2. Curriculum */}
-                <div className="space-y-8">
-                    <h3 className="text-2xl font-bold flex items-center gap-3">
-                        <BookOpen className="text-rose-600" /> 커리큘럼 모듈
-                    </h3>
-                    <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-                        {selectedCert.curriculum.map((module, i) => (
-                            <div key={i} className="space-y-5">
-                                <div className="text-sm font-bold text-rose-600 uppercase tracking-widest">모듈 0{i+1}</div>
-                                <h4 className="text-xl font-bold">{module.title}</h4>
-                                <ul className="space-y-3">
-                                    {module.items.map((item, idx) => (
-                                        <li key={idx} className="text-sm text-zinc-500 flex items-start gap-2">
-                                            <div className="w-1.5 h-1.5 rounded-full bg-rose-600 mt-1.5 shrink-0"></div>
-                                            {item}
-                                        </li>
-                                    ))}
-                                </ul>
+                {!isApplicationMode ? (
+                  /* --- 1. 상세 정보 뷰 (기존 코드 유지) --- */
+                  <>
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-6">
+                        {[
+                            { icon: <Building size={18} />, label: "인증 기관", value: selectedCert.overview.institution },
+                            { icon: <Layers size={18} />, label: "수준", value: selectedCert.overview.level },
+                            { icon: <Clock size={18} />, label: "소요 시간", value: selectedCert.overview.duration },
+                            { icon: <MapPin size={18} />, label: "교육 형태", value: selectedCert.overview.format },
+                            { icon: <Calendar size={18} />, label: "유효 기간", value: selectedCert.overview.validity },
+                        ].map((item, i) => (
+                            <div key={i} className="p-6 bg-zinc-50 rounded-3xl space-y-3">
+                                <div className="text-rose-600">{item.icon}</div>
+                                <div className="text-[10px] font-bold text-zinc-400 uppercase tracking-widest">{item.label}</div>
+                                <div className="text-sm font-bold text-zinc-900 leading-snug">{item.value}</div>
                             </div>
                         ))}
                     </div>
-                </div>
 
-                {/* 3. Tools & Requirements */}
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-12">
                     <div className="space-y-8">
                         <h3 className="text-2xl font-bold flex items-center gap-3">
-                            <Wrench className="text-rose-600" /> 학습 도구 및 플랫폼
+                            <BookOpen className="text-rose-600" /> 커리큘럼 모듈
                         </h3>
-                        <div className="flex flex-wrap gap-2">
-                            {selectedCert.tools.map((tool, i) => (
-                                <span key={i} className="px-4 py-2 bg-zinc-100 rounded-xl text-xs font-bold text-zinc-700">
-                                    {tool}
-                                </span>
-                            ))}
-                        </div>
-                    </div>
-                    <div className="space-y-8">
-                        <h3 className="text-2xl font-bold flex items-center gap-3">
-                            <Trophy className="text-rose-600" /> 인증 획득 조건
-                        </h3>
-                        <div className="space-y-3">
-                            {selectedCert.requirements.map((req, i) => (
-                                <div key={i} className="flex items-center gap-3 text-sm text-zinc-600 font-medium">
-                                    <CheckCircle size={16} className="text-emerald-500" />
-                                    {req}
+                        <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+                            {selectedCert.curriculum.map((module, i) => (
+                                <div key={i} className="space-y-5">
+                                    <div className="text-sm font-bold text-rose-600 uppercase tracking-widest">모듈 0{i+1}</div>
+                                    <h4 className="text-xl font-bold">{module.title}</h4>
+                                    <ul className="space-y-3">
+                                        {module.items.map((item, idx) => (
+                                            <li key={idx} className="text-sm text-zinc-500 flex items-start gap-2">
+                                                <div className="w-1.5 h-1.5 rounded-full bg-rose-600 mt-1.5 shrink-0"></div>
+                                                {item}
+                                            </li>
+                                        ))}
+                                    </ul>
                                 </div>
                             ))}
                         </div>
                     </div>
-                </div>
 
-                {/* 4. Career & Effects */}
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-12">
-                    <div className="space-y-8">
-                        <h3 className="text-2xl font-bold flex items-center gap-3">
-                            <Target className="text-rose-600" /> 취업 및 활동 분야
-                        </h3>
-                        <div className="grid grid-cols-2 gap-4">
-                            {selectedCert.careers.map((career, i) => (
-                                <div key={i} className="p-4 border border-zinc-100 rounded-2xl text-sm font-bold text-zinc-700 hover:border-rose-200 transition-colors">
-                                    {career}
-                                </div>
-                            ))}
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-12">
+                        <div className="space-y-8">
+                            <h3 className="text-2xl font-bold flex items-center gap-3">
+                                <Wrench className="text-rose-600" /> 학습 도구 및 플랫폼
+                            </h3>
+                            <div className="flex flex-wrap gap-2">
+                                {selectedCert.tools.map((tool, i) => (
+                                    <span key={i} className="px-4 py-2 bg-zinc-100 rounded-xl text-xs font-bold text-zinc-700">
+                                        {tool}
+                                    </span>
+                                ))}
+                            </div>
+                        </div>
+                        <div className="space-y-8">
+                            <h3 className="text-2xl font-bold flex items-center gap-3">
+                                <Trophy className="text-rose-600" /> 인증 획득 조건
+                            </h3>
+                            <div className="space-y-3">
+                                {selectedCert.requirements.map((req, i) => (
+                                    <div key={i} className="flex items-center gap-3 text-sm text-zinc-600 font-medium">
+                                        <CheckCircle size={16} className="text-emerald-500" />
+                                        {req}
+                                    </div>
+                                ))}
+                            </div>
                         </div>
                     </div>
-                    <div className="space-y-8">
-                        <h3 className="text-2xl font-bold flex items-center gap-3">
-                            <Sparkles className="text-rose-600" /> 기대 효과
-                        </h3>
-                        <ul className="space-y-4">
-                            {selectedCert.effects.map((effect, i) => (
-                                <li key={i} className="text-sm text-zinc-500 leading-relaxed">
-                                    • {effect}
-                                </li>
-                            ))}
-                        </ul>
-                    </div>
-                </div>
+                  </>
+                ) : (
+                  /* --- 2. 지원 안내 뷰 (요청받은 필수 섹션 9개) --- */
+                  <div className="animate-in fade-in slide-in-from-right-10 duration-500 space-y-16">
+                    {/* 1 & 2: 제목과 부제목은 헤더에 포함됨 */}
+                    
+                    {/* 3: 학습 내용/커리큘럼 (리스트형) */}
+                    <section className="space-y-6">
+                      <h3 className="text-2xl font-bold flex items-center gap-3 text-zinc-900">
+                        <BookOpen className="text-rose-600" /> 학습 내용 및 커리큘럼
+                      </h3>
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        {selectedCert.curriculum.flatMap(m => m.items).map((item, idx) => (
+                          <div key={idx} className="flex items-center gap-4 p-5 bg-zinc-50 rounded-2xl border border-zinc-100 hover:border-rose-200 transition-all">
+                            <div className="w-8 h-8 rounded-full bg-rose-100 text-rose-600 flex items-center justify-center text-xs font-bold">{idx + 1}</div>
+                            <span className="text-zinc-700 font-medium">{item}</span>
+                          </div>
+                        ))}
+                      </div>
+                    </section>
 
-                {/* 5. Benefits & Eligibility */}
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-12">
-                    <div className="space-y-8">
+                    {/* 4 & 5: 참여 대상 및 일정 */}
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-12">
+                      <section className="space-y-6">
                         <h3 className="text-2xl font-bold flex items-center gap-3">
-                            <Gift className="text-rose-600" /> 파트너십 혜택
+                          <Users className="text-rose-600" /> 참여 대상 및 선수 요건
                         </h3>
-                        <div className="flex flex-wrap gap-3">
-                            {selectedCert.benefits.map((benefit, i) => (
-                                <span key={i} className="px-4 py-2 bg-rose-50 text-rose-600 rounded-xl text-xs font-bold">
-                                    {benefit}
-                                </span>
-                            ))}
+                        <div className="bg-zinc-50 p-8 rounded-[2rem] space-y-4">
+                          {selectedCert.eligibility.map((el, i) => (
+                            <div key={i} className="flex items-start gap-3 text-zinc-600">
+                              <CheckCircle size={18} className="text-emerald-500 mt-1 shrink-0" />
+                              <span className="leading-relaxed">{el}</span>
+                            </div>
+                          ))}
                         </div>
-                    </div>
-                    <div className="space-y-8">
+                      </section>
+                      <section className="space-y-6">
                         <h3 className="text-2xl font-bold flex items-center gap-3">
-                            <Users className="text-rose-600" /> 지원 자격
+                          <Calendar className="text-rose-600" /> 프로그램 기간 및 일정
                         </h3>
-                        <ul className="space-y-3">
-                            {selectedCert.eligibility.map((el, i) => (
-                                <li key={i} className="text-sm text-zinc-600">• {el}</li>
-                            ))}
-                        </ul>
+                        <div className="bg-zinc-50 p-8 rounded-[2rem] flex flex-col justify-center gap-4">
+                          <div className="flex items-center gap-4">
+                            <Clock className="text-zinc-400" />
+                            <div>
+                              <div className="text-xs font-bold text-zinc-400 uppercase tracking-widest">Duration</div>
+                              <div className="text-xl font-bold text-zinc-900">{selectedCert.overview.duration}</div>
+                            </div>
+                          </div>
+                          <div className="h-px bg-zinc-200 w-full"></div>
+                          <div className="flex items-center gap-4">
+                            <Layers className="text-zinc-400" />
+                            <div>
+                              <div className="text-xs font-bold text-zinc-400 uppercase tracking-widest">Schedule</div>
+                              <div className="text-sm font-medium text-zinc-600 leading-relaxed">{selectedCert.scheduleDetails || "추후 공지 예정"}</div>
+                            </div>
+                          </div>
+                        </div>
+                      </section>
                     </div>
-                </div>
 
-                {/* 6. Cost */}
-                <div className="p-10 bg-zinc-950 text-white rounded-[2.5rem] flex flex-col md:flex-row items-center justify-between gap-8">
-                    <div className="space-y-2">
-                        <div className="text-xs font-bold text-rose-500 uppercase tracking-widest">Investment</div>
-                        <h3 className="text-3xl font-bold">비용 및 지원 혜택</h3>
-                    </div>
-                    <div className="flex flex-col md:flex-row gap-8 items-center">
-                        <div className="text-center md:text-right">
-                            <div className="text-sm text-zinc-400">교육 비용</div>
-                            <div className="text-2xl font-bold text-rose-500">{selectedCert.cost.base}</div>
+                    {/* 6: 비용 정보 */}
+                    <section className="space-y-6">
+                      <h3 className="text-2xl font-bold flex items-center gap-3">
+                        <CreditCard className="text-rose-600" /> 비용 및 지원 혜택
+                      </h3>
+                      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                        <div className="p-8 bg-zinc-950 text-white rounded-[2rem] shadow-xl shadow-zinc-200">
+                          <div className="text-xs text-rose-500 font-bold mb-2 uppercase tracking-widest">Base Cost</div>
+                          <div className="text-3xl font-bold mb-1">{selectedCert.cost.base}</div>
+                          <div className="text-[10px] text-zinc-500">VAT 포함 금액</div>
                         </div>
-                        <div className="w-px h-12 bg-white/10 hidden md:block"></div>
-                        <div className="text-center md:text-right">
-                            <div className="text-sm text-zinc-400">할인 및 장학</div>
-                            <div className="text-sm font-bold">{selectedCert.cost.discount}</div>
-                            <div className="text-[10px] text-zinc-500">{selectedCert.cost.scholarship}</div>
+                        <div className="p-8 bg-zinc-50 border border-zinc-100 rounded-[2rem]">
+                          <div className="text-xs text-zinc-400 font-bold mb-2 uppercase tracking-widest">Discount Policy</div>
+                          <div className="text-lg font-bold text-zinc-900">{selectedCert.cost.discount}</div>
                         </div>
-                    </div>
-                </div>
+                        <div className="p-8 bg-zinc-50 border border-zinc-100 rounded-[2rem]">
+                          <div className="text-xs text-zinc-400 font-bold mb-2 uppercase tracking-widest">Scholarship</div>
+                          <div className="text-lg font-bold text-zinc-900">{selectedCert.cost.scholarship}</div>
+                        </div>
+                      </div>
+                    </section>
+
+                    {/* 7: 지원 방법/절차 (시각적 아이콘) */}
+                    <section className="space-y-8">
+                      <h3 className="text-2xl font-bold flex items-center gap-3">
+                        <ClipboardCheck className="text-rose-600" /> 지원 방법 및 절차
+                      </h3>
+                      <div className="relative">
+                        <div className="absolute top-1/2 left-0 w-full h-0.5 bg-zinc-100 -z-10 hidden md:block"></div>
+                        <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
+                          {(selectedCert.applicationProcess || ["지원서 제출", "심사", "발표", "등록"]).map((step, i) => (
+                            <div key={i} className="flex flex-col items-center text-center space-y-4 bg-white md:bg-transparent">
+                              <div className="w-12 h-12 rounded-full bg-zinc-900 text-white flex items-center justify-center font-bold shadow-lg border-4 border-white">{i + 1}</div>
+                              <div className="text-sm font-bold text-zinc-900">{step}</div>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    </section>
+
+                    {/* 8: 주요 혜택/보상 */}
+                    <section className="space-y-6">
+                      <h3 className="text-2xl font-bold flex items-center gap-3">
+                        <Gift className="text-rose-600" /> 주요 참여 혜택 및 보상
+                      </h3>
+                      <div className="flex flex-wrap gap-4">
+                        {selectedCert.benefits.map((benefit, i) => (
+                          <div key={i} className="px-6 py-4 bg-rose-50 rounded-2xl flex items-center gap-3 group hover:bg-rose-600 transition-all cursor-default">
+                            <Sparkles size={18} className="text-rose-600 group-hover:text-white" />
+                            <span className="text-rose-900 group-hover:text-white font-bold">{benefit}</span>
+                          </div>
+                        ))}
+                      </div>
+                    </section>
+                  </div>
+                )}
             </div>
 
             {/* Modal Footer */}
-            <div className="p-8 md:p-10 border-t border-zinc-100 flex justify-between items-center">
+            <div className="p-8 md:p-10 border-t border-zinc-100 flex justify-between items-center bg-white">
                 <button 
-                  onClick={() => setSelectedCert(null)}
+                  onClick={() => {
+                    if (isApplicationMode) setIsApplicationMode(false);
+                    else closeModal();
+                  }}
                   className="text-zinc-400 hover:text-zinc-900 font-bold text-sm transition-colors"
                 >
-                  취소하기
+                  {isApplicationMode ? "이전으로" : "취소하기"}
                 </button>
-                <button className="px-10 py-4 bg-rose-600 text-white rounded-full font-bold shadow-xl shadow-rose-200 hover:scale-105 transition-all">
-                  지금 바로 지원하기
+                <button 
+                  onClick={() => {
+                    if (!isApplicationMode) setIsApplicationMode(true);
+                    else {
+                      alert("지원 시스템으로 연결됩니다. (Next Level Flow)");
+                    }
+                  }}
+                  className={`px-10 py-5 ${isApplicationMode ? 'bg-zinc-950' : 'bg-rose-600'} text-white rounded-full font-bold shadow-xl transition-all hover:scale-105 flex items-center gap-3`}
+                >
+                  {isApplicationMode ? (
+                    <>지원서 제출하기 <Send size={18} /></>
+                  ) : (
+                    <>지금 바로 지원하기 <ArrowRight size={18} /></>
+                  )}
                 </button>
             </div>
           </div>
         </div>
       )}
 
-      {/* Partnership Section (Copied from bottom of page) */}
+      {/* Partnership Section */}
       <section className="bg-zinc-950 py-32 text-white">
         <div className="max-w-7xl mx-auto px-6">
           <div className="text-center mb-24 space-y-4">
